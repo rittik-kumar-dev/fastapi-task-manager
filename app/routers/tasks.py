@@ -20,17 +20,18 @@ def get_db_cursor():
     
     
 @router.get("/tasks",response_model=ResponseSchema,summary="Retrive all tasks",
-            description="Fetches a complete list of all existing tasks directly from the Mysql database backend.")  
-def get_all_tasks(db=Depends(get_db_cursor)):
-    try:
-        db.execute("SELECT * FROM tasks")
-        all_tasks = db.fetchall()
-        return {"status": "success", "data": all_tasks}
+            description="Fetches a complete list of all existing tasks directly from the Mysql database backend.") 
+#To use Asychronization, we write the "async" keyword before a function 
+async def get_all_tasks(db=Depends(get_db_cursor)):
+        try:
+            db.execute("SELECT * FROM tasks")
+            all_tasks = db.fetchall()
+            return {"status": "success", "data": all_tasks}
     
     
-    except Exception:  
+        except Exception:  
 
-        raise HTTPException(status_code=500,detail="Internal server error")
+            raise HTTPException(status_code=500,detail="Internal server error")
 
         
 
