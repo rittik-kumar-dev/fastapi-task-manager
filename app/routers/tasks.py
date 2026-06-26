@@ -3,13 +3,14 @@ from app.database import db_connection
 
 from pydantic import BaseModel 
 from app.schemas.task import TakeSchema,ResponseSchema
-router=APIRouter()
+router=APIRouter(tags=["Task Management"])
 
 
     
     
     
-@router.get("/tasks",response_model=ResponseSchema)  # Decorator + HTTP Method + Path
+@router.get("/tasks",response_model=ResponseSchema,summary="Retrive all tasks",
+            description="Fetches a complete list of all existing tasks directly from the Mysql database backend.")  
 def get_all_tasks():
     
     cursor=None
