@@ -2,15 +2,16 @@ from fastapi import APIRouter, HTTPException
 from app.database import db_connection
 
 from pydantic import BaseModel 
-from app.schemas.task import TakeSchema
+from app.schemas.task import TakeSchema,ResponseSchema
 router=APIRouter()
 
 
     
     
     
-@router.get("/tasks")  # Decorator + HTTP Method + Path
+@router.get("/tasks",response_model=ResponseSchema)  # Decorator + HTTP Method + Path
 def get_all_tasks():
+    
     cursor=None
     connection=None
     try:
