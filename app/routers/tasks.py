@@ -1,9 +1,19 @@
-from fastapi import APIRouter, HTTPException  
+from fastapi import APIRouter, HTTPException ,Depends
 from app.database import db_connection
 
 from pydantic import BaseModel 
 from app.schemas.task import TakeSchema,ResponseSchema
 router=APIRouter(tags=["Task Management"])
+
+#this is the dependency function
+def get_db_cursor():
+    connection=db_connection()
+    cursor=connection.cursor()
+    try:
+        yield cursor
+    finally:
+        cursor.close()
+        connection.close()    
 
 
     
@@ -11,27 +21,22 @@ router=APIRouter(tags=["Task Management"])
     
 @router.get("/tasks",response_model=ResponseSchema,summary="Retrive all tasks",
             description="Fetches a complete list of all existing tasks directly from the Mysql database backend.")  
-def get_all_tasks():
-    
-    cursor=None
-    connection=None
+def get_all_tasks(db=Depends(get_db_cursor)):
     try:
-        connection = db_connection()
-        cursor = connection.cursor()
+        db.execute("SELECT * FROM tasks")
+        all_tasks = db.fetchall()
+        return {"status": "success", "data": all_tasks}
+    
+    
+    except Exception:  
 
-        cursor.execute("SELECT * FROM tasks")
-        all_tasks = cursor.fetchall()
+        raise HTTPException(status_code=500,detail="Internal server error")
 
         
 
-        return {"status": "success", "data": all_tasks}
-    except Exception:
-        raise HTTPException(status_code=500,detail="Internal server error")
-    finally:
-        if cursor:
-            cursor.close()
-        if connection:
-            connection.close()  
+   
+    
+    
 
 
 @router.post("/tasks")
