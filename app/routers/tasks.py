@@ -3,6 +3,7 @@ from app.database import db_connection
 
 from pydantic import BaseModel 
 from app.schemas.task import TakeSchema,ResponseSchema
+from app.services.task_service import Task_service
 router=APIRouter(tags=["Task Management"])
 
 #this is the dependency function
@@ -24,9 +25,12 @@ def get_db_cursor():
 #To use Asychronization, we write the "async" keyword before a function 
 async def get_all_tasks(db=Depends(get_db_cursor)):
         try:
-            db.execute("SELECT * FROM tasks")
-            all_tasks = db.fetchall()
-            return {"status": "success", "data": all_tasks}
+         #By creating service Layer file(task_service), we remove all database query 
+         # and Bussiness logic from this file ,then move to task_service
+         
+            all_tasks=Task_service.get_all_tasks(db)
+            return {"status":"success","data":all_tasks}
+            
     
     
         except Exception:  
